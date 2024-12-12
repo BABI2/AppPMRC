@@ -1,0 +1,50 @@
+﻿@using WebAppPMRC.ViewModels;
+@model RegisterViewModel;
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="form-container">
+    <!-- Logo -->
+    <img src="https://via.placeholder.com/50" alt="Logo" class="mb-3">
+    <h1>Register</h1>
+
+    <!-- Form -->
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="Enter email">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" placeholder="Enter email">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Enter password">
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ConfirmPassword" class="form-label"></label>
+            <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Enter password">
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        
+        <button type="submit" class="btn btn-custom">Register</button>
+        <p class="text-center mt-2">
+            Already have an account?<a asp-controller="Account" asp-action="Login" class="text-decoration-none">SIGN UP</a>
+        </p>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+    }
+}
+

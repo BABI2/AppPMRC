@@ -1,0 +1,33 @@
+﻿@model IEnumerable<WebAppPMRC.ViewModels.NumeroDossierViewModel>
+
+<h2>Liste des numéros de dossier</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nom</th>
+            <th>Numéro de dossier</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.NomPerson</td>
+                <td>@item.DossierNumero</td>
+                <td>
+                    <a asp-action="AddOrEdit" asp-route-id="@item.Id" class="btn btn-primary">Modifier</a>
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="AddOrEdit" class="btn btn-success">Ajouter un numéro de dossier</a>

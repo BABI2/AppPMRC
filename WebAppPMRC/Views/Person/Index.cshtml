@@ -1,0 +1,54 @@
+﻿@model IEnumerable<WebAppPMRC.ViewModels.PersonViewModel>
+
+<h2 class="text-center mb-5">List of Persons</h2>
+
+<a href="@Url.Action("AddOrEdit", "Person")" class="btn btn-primary mb-3">New Person</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="thead-light">
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Surnom</th>
+            <th>Contact</th>
+            <th>Superficie</th>
+            <th>Prix/M²</th>
+            <th>Montant</th>
+            <th>Photo</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="9" class="text-center text-muted">Aucune personne trouvée.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var person in Model)
+            {
+                <tr>
+                    <td>@person.Nom</td>
+                    <td>@person.Prenom</td>
+                    <td>@person.Surnom</td>
+                    <td>@person.Contact</td>
+                    <td>@person.Superficie.ToString("N0") m²</td>
+                    <td>@person.PrixM2.ToString("C")</td>
+                    <td>@person.MontantComp.ToString("C")</td>
+                    <td>
+                        <img src="@Url.Content("~/Uploads/" + person.PhotoPath)" alt="Photo" class="img-thumbnail" width="50" />
+                    </td>
+                    <td>
+                        <a href="@Url.Action("AddOrEdit", "Person", new { id = person.Id })" class="btn btn-warning btn-sm">Edit</a>
+                        <form asp-action="Delete" asp-controller="Person" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@person.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette personne ?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

@@ -1,0 +1,32 @@
+﻿@model IEnumerable<WebAppPMRC.ViewModels.LocaliteViewModel>
+
+
+<h2 class="text-center mb-5">List of Localities</h2>
+
+<a href="@Url.Action("AddOrEdit", "Localite")" class="btn btn-primary">New Locality</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Region</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var localite in Model)
+        {
+            <tr>
+                <td>@localite.Nom</td>
+                <td>@localite.NomRegion</td>
+                <td>
+                    <a href="@Url.Action("AddOrEdit", "Localite", new { id = localite.Id })" class="btn btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-controller="Localite" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@localite.Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

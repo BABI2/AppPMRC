@@ -1,0 +1,62 @@
+﻿@using WebAppPMRC.ViewModels;
+@model LoginViewModel;
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="form-container">
+    <!-- Logo -->
+    <img src="https://via.placeholder.com/50" alt="Logo" class="mb-3">
+    <h1>Login</h1>
+
+    <!-- Form -->
+    <form asp-action="Login" asp-controller="Account" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" placeholder="Enter email">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Enter password">
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- Forgot password -->
+        <div class="float-end">
+            <a asp-controller="Account" asp-action="VerifyEmail" class="text-decoration-none">
+                Forgot password?
+            </a>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="form-check mb-3">
+            <label class="form-check-label">
+                <input asp-for="RememberMe" class="form-check-input" />
+                Remember Me
+            </label>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-custom">LOGIN</button>
+
+        <!-- Register -->
+        <p class="text-center mt-2">
+            Don't have an account?
+            <a asp-controller="Account" asp-action="Register" class="text-decoration-none">Register</a>
+        </p>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

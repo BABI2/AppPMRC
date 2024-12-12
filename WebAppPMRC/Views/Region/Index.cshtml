@@ -1,0 +1,29 @@
+﻿@model IEnumerable<WebAppPMRC.ViewModels.RegionViewModel>
+
+<h2 class="text-center mb-5">List of Regions</h2>
+
+<a href="@Url.Action("AddOrEdit", "Region")" class="btn btn-primary">New Region</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var region in Model)
+        {
+            <tr>
+                <td>@region.Nom</td>
+                <td>
+                    <a href="@Url.Action("AddOrEdit", "Region", new { id = region.Id })" class="btn btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-controller="Region" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@region.Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

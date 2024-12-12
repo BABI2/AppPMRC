@@ -1,0 +1,130 @@
+﻿@model WebAppPMRC.ViewModels.PersonViewModel
+
+<div class="row">
+    <div class="col-md-8 mx-auto rounded border p-3">
+        <h2>@(Model.Id == 0 ? "Add a Person" : "Modify a Person")</h2>
+
+        <form asp-action="AddOrEdit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+
+            <div id="formSections">
+                <!-- Section 1 -->
+                <div class="form-section" id="section-1">
+                    <div class="row mb-3">
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Nom" class="control-label"></label>
+                            <input asp-for="Nom" class="form-control" />
+                            <span asp-validation-for="Nom" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Prenom" class="control-label"></label>
+                            <input asp-for="Prenom" class="form-control" />
+                            <span asp-validation-for="Prenom" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Surnom" class="control-label"></label>
+                            <input asp-for="Surnom" class="form-control" />
+                            <span asp-validation-for="Surnom" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Contact" class="control-label"></label>
+                            <input asp-for="Contact" class="form-control" />
+                            <span asp-validation-for="Contact" class="text-danger"></span>
+                        </div>
+
+                        <!-- Sélection de la Région -->
+                        <div class="col-md-6 form-group">
+                            <label for="regionSelect">Région</label>
+                            <select id="regionSelect" class="form-control" name="RegionId">
+                                <option value="">Sélectionnez une région</option>
+                                @foreach (var region in ViewBag.Regions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>())
+                                {
+                                    <option value="@region.Value"
+                                            selected="@(region.Value == Model.RegionId.ToString() ? "selected" : "")">
+                                        @region.Text
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sélection de la Localité -->
+                        <div class="col-md-6 form-group">
+                            <label for="localiteSelect">Localité</label>
+                            <select id="localiteSelect" class="form-control" name="LocaliteId">
+                                <option value="">-- Sélectionnez une localité --</option>
+                                @foreach (var localite in Model.Localites)
+                                {
+                                    <option value="@localite.Value"
+                                            selected="@(localite.Value == Model.LocaliteId.ToString() ? "selected" : "")">
+                                        @localite.Text
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="form-section d-none" id="section-2">
+                    <div class="row mb-3">
+                        <div class="form-group">
+                            <label asp-for="Longueur" class="control-label"></label>
+                            <input asp-for="Longueur" class="form-control" />
+                            <span asp-validation-for="Longueur" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Largeur" class="control-label"></label>
+                            <input asp-for="Largeur" class="form-control" />
+                            <span asp-validation-for="Largeur" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Superficie</label>
+                            <input type="text" id="superficieField" class="form-control" value="@Model.Superficie" readonly disabled/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="form-section d-none" id="section-3">
+                    <div class="row mb-3">
+                        <div class="form-group">
+                            <label asp-for="PrixM2" class="control-label"></label>
+                            <input asp-for="PrixM2" class="form-control" />
+                            <span asp-validation-for="PrixM2" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MontantComp" class="control-label"></label>
+                            <input asp-for="MontantComp" class="form-control" />
+                            <span asp-validation-for="MontantComp" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Commentaire" class="control-label"></label>
+                            <textarea asp-for="Commentaire" class="form-control"></textarea>
+                            <span asp-validation-for="Commentaire" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Photo" class="control-label"></label>
+                            <input asp-for="Photo" type="file" class="form-control" />
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                        {
+                            <div>
+                                <label>Photo actuelle :</label>
+                                <img src="~/Uploads/@Model.PhotoPath" alt="Photo actuelle" width="50" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="button" class="btn btn-secondary" id="prevButton" disabled>Prev</button>
+                <button type="button" class="btn btn-primary" id="nextButton">Next</button>
+                <button type="submit" class="btn btn-success d-none" id="submitButton">Save</button>
+                <a href="@Url.Action("Index", "Person")" class="btn btn-secondary">Back</a>
+            </div>
+        </form>
+    </div>
+</div>

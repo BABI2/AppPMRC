@@ -1,0 +1,25 @@
+﻿@model WebAppPMRC.ViewModels.NumeroDossierViewModel
+
+<h2>@(Model.Id == 0 ? "Ajouter un numéro de dossier" : "Modifier le numéro de dossier")</h2>
+
+<form asp-action="AddOrEdit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="DossierNumero"></label>
+        <input asp-for="DossierNumero" class="form-control" />
+        <span asp-validation-for="DossierNumero" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PersonId">Personne associée</label>
+        <select asp-for="PersonId" class="form-control" asp-items="@(new SelectList(ViewBag.PersonList, "Id", "FullName"))">
+            <option value="">-- Sélectionner une personne --</option>
+        </select>
+        <span asp-validation-for="PersonId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>
