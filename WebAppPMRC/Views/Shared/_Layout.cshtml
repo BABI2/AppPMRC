@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="~/WebAppPMRC.styles.css" asp-append-version="true" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
 </head>
-<body>
-    <header>
+<body class="" style="height:100vh;">
+   @*  <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <!-- Lien vers la page d'accueil -->
@@ -22,51 +22,63 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <!-- Lien vers la page Localite -->
-                        <li class="nav-item " >
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Localite" asp-action="Index">Localite</a>
-                        </li>
-                        <!-- Lien vers la page Region -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Region" asp-action="Index">Region</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="NumeroDossier" asp-action="Index">NumeroDossier</a>
-                        </li>
-
-                        <!-- Lien vers la page des Personnes -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Person" asp-action="Index">Person</a>
-                        </li>
-
-                        
-
-                        <!-- Affichage de la section Login/Logout -->
-                        <partial name="_LoginPartial" />
-                    </ul>
+                  
                 </div>
             </div>
         </nav>
-    </header>
+    </header> *@
 
     <!-- Sidebar -->
     
 
         <!-- Contenu principal -->
-        <div class="container-fluid">
-            <main role="main" class="pb-3">
+    <div class="container-fluid p-0  h-100" >
+            <div class=" d-flex h-100" >
+            <div class=" h-100  d-flex flex-column justify-content-between " style="width:300px;  background-color: #2a5298;">
+                <ul class="navbar-nav flex-grow-1 d-flex mx-auto mt-5 ">
+                    <!--Dashboard-->
+                    <li class="nav-item mt-4 ">
+                        <a class="butonClick fs-4 " asp-area="" asp-controller="Localite" asp-action="Index">Dashboard</a>
+                    </li>
+                    <!-- Lien vers la page Localite -->
+                    <li class="nav-item mt-4">
+                        <a class="butonClick fs-4" asp-area="" asp-controller="Localite" asp-action="Index">Localite</a>
+                    </li>
+                    <!-- Lien vers la page Region -->
+                    <li class="nav-item mt-4">
+                        <a class="butonClick fs-4" asp-area="" asp-controller="Region" asp-action="Index">Region</a>
+                    </li>
+
+                    <li class="nav-item mt-4">
+                        <a class="butonClick fs-4" asp-area="" asp-controller="NumeroDossier" asp-action="Index">Dossier</a>
+                    </li>
+
+                    <!-- Lien vers la page des Personnes -->
+                    <li class="nav-item mt-4">
+                        <a class="butonClick fs-4" asp-area="" asp-controller="Person" asp-action="Index">Person</a>
+                    </li>
+
+                </ul>
+                <div>
+                    <!-- Affichage de la section Login/Logout -->
+                    <partial name="_LoginPartial" />
+                </div>
+                   
+               
+            </div>
+            
+            <main role="main" class="w-100 mx-3 ">
                 @RenderBody()
             </main>
         </div>
+        </div>
  
         <!-- Footer -->
-        <footer class="border-top footer text-muted">
+      @*   <footer class="border-top footer text-muted">
             <div class="container">
                 &copy; 2024 - PMRC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
             </div>
-        </footer>
+        </footer> *@
 
         <!-- Scripts -->
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
