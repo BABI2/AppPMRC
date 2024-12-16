@@ -16,10 +16,14 @@
 .btn-custom {
     background-color: #2a5298;
     color: white;
-    width: 10%;
+    width: 180px;
     border-radius: 5px;
     padding: 10px;
     font-weight: bold;   
+}
+
+.cardForme{
+    border-radius:20px;
 }
 
 
