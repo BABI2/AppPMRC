@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebAppPMRC.Data;
 using WebAppPMRC.Models;
 using WebAppPMRC.Services;
 using WebAppPMRC.ViewModels;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
 
 namespace WebAppPMRC.Controllers
 {

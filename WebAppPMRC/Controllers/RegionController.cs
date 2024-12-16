@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using WebAppPMRC.Data;
 using WebAppPMRC.Models;
 using WebAppPMRC.ViewModels;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebAppPMRC.Controllers
 {

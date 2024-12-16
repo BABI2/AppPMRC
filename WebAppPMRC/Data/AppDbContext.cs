@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using WebAppPMRC.Configurations;
 using WebAppPMRC.Models;
 
 namespace WebAppPMRC.Data
