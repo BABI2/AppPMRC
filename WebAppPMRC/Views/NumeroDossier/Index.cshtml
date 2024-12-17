@@ -1,8 +1,11 @@
-﻿@model IEnumerable<WebAppPMRC.ViewModels.NumeroDossierViewModel>
+﻿<h2 class="mb-5">Liste des numéros de dossier</h2>
 
-<h2 class="mb-5">Liste des numéros de dossier</h2>
+<form method="get" class="form-inline mb-4">
+    <input type="text" name="search" class="form-control" placeholder="Rechercher par nom" />
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+</form>
+
 <a asp-action="AddOrEdit" class="btn btn-custom mb-4 fs-5">New dossier</a>
-
 
 <table class="table table-bordered table-hover">
     <thead>
@@ -31,4 +34,3 @@
         }
     </tbody>
 </table>
-

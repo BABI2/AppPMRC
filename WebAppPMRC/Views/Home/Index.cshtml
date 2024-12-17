@@ -1,29 +1,144 @@
-﻿<div class="container mt-5">
-    <div class="row mt-4 d-flex ">
+﻿@using WebAppPMRC.ViewModels
+@model DashboardViewModel
+
+<div class="container mt-5">
+    <div class="row mt-4 d-flex">
+        <!-- Carte Nombre de Personnes -->
         <div class="col d-flex justify-content-between">
             <div class="card cardForme" style="height:10rem; width:18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Nombre de Personnes</h5>
+                    <p class="card-text" id="personCount">@Model.PersonCount</p>
+                </div>
+            </div>
 
-            </div>
+            <!-- Carte Montant Total Payé -->
             <div class="card cardForme" style="height:10rem; width:18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Montant Total Payé</h5>
+                    <p class="card-text" id="totalAmount">@Model.TotalAmount.ToString("C")</p>
+                </div>
             </div>
-            </div>
+        </div>
+
+        <!-- Carte Nombre de Localités -->
         <div class="col d-flex justify-content-between">
             <div class="card cardForme" style="height:10rem; width:18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Nombre de Localités</h5>
+                    <p class="card-text" id="localityCount">@Model.LocalityCount</p>
+                </div>
             </div>
-            <div class="card cardForme" style="height:10rem; width:18rem;">
-            </div>
-        </div>
-        </div>
-<div class="row my-4">
-    <div class="col">
-        <div class="card cardForme" style="height:40rem;">
 
+            <!-- Carte Graphique des Montants -->
+            <div class="card cardForme" style="height:10rem; width:18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Graphique des Montants</h5>
+                    <canvas id="amountChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="row my-4">
+        <!-- Graphique Nombre de Personnes -->
         <div class="col">
             <div class="card cardForme" style="height:40rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Graphique Nombre de Personnes</h5>
+                    <canvas id="personChart"></canvas>
+                </div>
             </div>
         </div>
+
+        <!-- Graphique des Localités -->
+        <div class="col">
+            <div class="card cardForme" style="height:40rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Graphique des Localités</h5>
+                    <canvas id="localityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const personCount = @Model.PersonCount ?? 0;
+    const totalAmount = @Model.TotalAmount ?? 0;
+    const localityCount = @Model.LocalityCount ?? 0;
+    const localityData = @Html.Raw(Json.Serialize(Model.Localities ?? new List<string>()));
+    const amountData = @Html.Raw(Json.Serialize(Model.Amounts ?? new List<decimal>()));
+    const personData = @Html.Raw(Json.Serialize(Model.PersonNames ?? new List<string>()));
+
+    // Affichage des statistiques dans les cartes
+    document.getElementById('personCount').textContent = personCount;
+    document.getElementById('totalAmount').textContent = totalAmount.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
+    document.getElementById('localityCount').textContent = localityCount;
+
+    // Graphique des Montants Payés
+    const ctxAmount = document.getElementById('amountChart').getContext('2d');
+    new Chart(ctxAmount, {
+        type: 'bar',
+        data: {
+            labels: localityData,
+            datasets: [{
+                label: 'Montant Total Payé (XOF)',
+                data: amountData,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graphique Nombre de Personnes
+    const ctxPerson = document.getElementById('personChart').getContext('2d');
+    new Chart(ctxPerson, {
+        type: 'pie',
+        data: {
+            labels: personData,
+            datasets: [{
+                label: 'Répartition des Personnes',
+                data: amountData,
+                backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Graphique des Localités
+    const ctxLocality = document.getElementById('localityChart').getContext('2d');
+    new Chart(ctxLocality, {
+        type: 'line',
+        data: {
+            labels: localityData,
+            datasets: [{
+                label: 'Nombre de Personnes par Localité',
+                data: amountData,
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

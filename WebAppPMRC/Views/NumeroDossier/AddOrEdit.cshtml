@@ -1,6 +1,6 @@
 ﻿@model WebAppPMRC.ViewModels.NumeroDossierViewModel
 
-<h2>@(Model.Id == 0 ? "Ajouter un numéro de dossier" : "Modifier le numéro de dossier")</h2>
+<h2>@(Model.Id == 0 ? "Add a case number" : "Edit a case number")</h2>
 
 <form asp-action="AddOrEdit" method="post">
     @Html.AntiForgeryToken()
@@ -20,6 +20,6 @@
         <span asp-validation-for="PersonId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Enregistrer</button>
-    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

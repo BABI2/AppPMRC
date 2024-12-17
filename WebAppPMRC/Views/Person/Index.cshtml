@@ -2,9 +2,15 @@
 
 <h2 class="text-center mb-5">List of Persons</h2>
 
-<a href="@Url.Action("AddOrEdit", "Person")" class="btn btn-custom mb-4 fs-5">New Person</a>
+<div class="text-end mb-3">
+    <!-- Bouton pour l'impression globale -->
+    <button id="printGlobalButton" class="btn btn-custom fs-5">
+        <i class="fa fa-print"></i> Print the full list
+    </button>
+    <a href="@Url.Action("AddOrEdit", "Person")" class="btn btn-custom fs-5">New Person</a>
+</div>
 
-<table class="table table-bordered table-hover">
+<table id="personTable" class="table table-bordered table-hover">
     <thead class="thead-light">
         <tr>
             <th>Nom</th>
@@ -29,7 +35,7 @@
         {
             @foreach (var person in Model)
             {
-                <tr>
+                <tr data-id="@person.Id">
                     <td>@person.Nom</td>
                     <td>@person.Prenom</td>
                     <td>@person.Surnom</td>
@@ -42,6 +48,9 @@
                     </td>
                     <td>
                         <a href="@Url.Action("AddOrEdit", "Person", new { id = person.Id })" class="btn btn-warning btn-sm">Edit</a>
+                        <button type="button" class="btn btn-success btn-sm printIndividualButton">
+                            <i class="fa fa-print"></i> Print
+                        </button>
                         <form asp-action="Delete" asp-controller="Person" method="post" style="display:inline;">
                             <input type="hidden" name="id" value="@person.Id" />
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette personne ?')">Delete</button>

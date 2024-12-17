@@ -16,9 +16,9 @@ namespace WebAppPMRC.Controllers
         }
 
         // Afficher la liste des numéros de dossier
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string search)
         {
-            var numeroDossiers = await _context.NumeroDossiers
+            var numeroDossiersQuery = _context.NumeroDossiers
                 .Include(nd => nd.Person)
                 .Select(nd => new NumeroDossierViewModel
                 {
@@ -26,9 +26,14 @@ namespace WebAppPMRC.Controllers
                     DossierNumero = nd.DossierNumero,
                     PersonId = nd.PersonId,
                     NomPerson = $"{nd.Person.Nom} {nd.Person.Prenom}"
-                })
-                .ToListAsync();
+                });
 
+            if (!string.IsNullOrEmpty(search))
+            {
+                numeroDossiersQuery = numeroDossiersQuery.Where(nd => nd.NomPerson.Contains(search));
+            }
+
+            var numeroDossiers = await numeroDossiersQuery.ToListAsync();
             return View(numeroDossiers);
         }
 
@@ -36,7 +41,10 @@ namespace WebAppPMRC.Controllers
         [HttpGet]
         public async Task<IActionResult> AddOrEdit(int? id)
         {
-            var personnes = await _context.Persons.ToListAsync();
+            var personnes = await _context.Persons
+                .Where(p => !_context.NumeroDossiers.Any(nd => nd.PersonId == p.Id)) // Exclure les personnes déjà attribuées
+                .ToListAsync();
+
             ViewBag.PersonList = personnes.Select(p => new { p.Id, FullName = $"{p.Nom} {p.Prenom}" });
 
             if (id == null)
@@ -65,6 +73,13 @@ namespace WebAppPMRC.Controllers
         public async Task<IActionResult> AddOrEdit(NumeroDossierViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
+
+            // Vérifier si le numéro de dossier existe déjà
+            if (_context.NumeroDossiers.Any(nd => nd.DossierNumero == model.DossierNumero && nd.Id != model.Id))
+            {
+                ModelState.AddModelError("DossierNumero", "Ce numéro de dossier existe déjà.");
+                return View(model);
+            }
 
             if (model.Id == 0)
             {

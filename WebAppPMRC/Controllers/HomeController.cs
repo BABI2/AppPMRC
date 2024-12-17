@@ -1,23 +1,47 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using WebAppPMRC.Data;
 using WebAppPMRC.Models;
+using WebAppPMRC.ViewModels;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace WebAppPMRC.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly AppDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        // Injecter le contexte de la base de données
+        public HomeController(ILogger<HomeController> logger, AppDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var persons = await _context.Persons
+                .Include(p => p.Localite)
+                .ThenInclude(l => l.Region)
+                .ToListAsync();
+
+            var viewModel = new DashboardViewModel
+            {
+                PersonCount = persons.Count,
+                TotalAmount = persons.Sum(p => p.MontantComp),
+                LocalityCount = persons.Select(p => p.Localite).Distinct().Count(),
+                Localities = persons.Select(p => p.Localite?.Nom).Distinct().ToList(),
+                Amounts = persons.Select(p => p.MontantComp).ToList(),
+                PersonNames = persons.Select(p => p.Nom).ToList()
+            };
+
+            return View(viewModel);
         }
+
         [Authorize]
         public IActionResult Privacy()
         {
