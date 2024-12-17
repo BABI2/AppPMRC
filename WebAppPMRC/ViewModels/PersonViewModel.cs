@@ -47,7 +47,7 @@ namespace WebAppPMRC.ViewModels
         public int RegionId { get; set; }
         public IEnumerable<SelectListItem> Regions { get; set; } = new List<SelectListItem>();
 
-        [Required]
+        
         public string NumeroDossier { get; set; } = string.Empty;
     }
 }

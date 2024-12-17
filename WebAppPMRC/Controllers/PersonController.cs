@@ -5,6 +5,7 @@ using WebAppPMRC.Data;
 using WebAppPMRC.Models;
 using WebAppPMRC.Services;
 using WebAppPMRC.ViewModels;
+using System.Globalization;
 
 namespace WebAppPMRC.Controllers
 {
@@ -45,6 +46,7 @@ namespace WebAppPMRC.Controllers
 
             return View(viewModels);
         }
+
         [HttpGet]
         public async Task<IActionResult> AddOrEdit(int? id)
         {
@@ -94,60 +96,21 @@ namespace WebAppPMRC.Controllers
             return View(viewModel);
         }
 
-
-        //[HttpGet]
-        //public async Task<IActionResult> AddOrEdit(int? id)
-        //{
-        //    var regions = await _context.Regions.ToListAsync();
-        //    ViewBag.Regions = regions;
-
-        //    var localites = await _context.Localites.Include(l => l.Region).ToListAsync();
-
-        //    var viewModel = new PersonViewModel
-        //    {
-        //        Regions = regions.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Nom }),
-        //        Localites = localites.Select(l => new SelectListItem { Value = l.Id.ToString(), Text = l.Nom })
-        //    };
-
-        //    if (id.HasValue)
-        //    {
-        //        var person = await _context.Persons.FindAsync(id.Value);
-        //        if (person == null) return NotFound();
-
-        //        viewModel.Id = person.Id;
-        //        viewModel.Nom = person.Nom;
-        //        viewModel.Prenom = person.Prenom;
-        //        viewModel.Surnom = person.Surnom;
-        //        viewModel.Contact = person.Contact;
-        //        viewModel.Longueur = person.Longueur;
-        //        viewModel.Largeur = person.Largeur;
-        //        viewModel.PrixM2 = person.PrixM2;
-        //        viewModel.MontantComp = person.MontantComp;
-        //        viewModel.Commentaire = person.Commentaire;
-        //        viewModel.PhotoPath = person.PhotoPath;
-        //        viewModel.LocaliteId = person.LocaliteId;
-        //        viewModel.RegionId = person.Localite?.RegionId ?? 0;
-        //    }
-
-        //    return View(viewModel);
-        //}
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit(PersonViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                // Recharger les dropdowns en cas d'erreur
                 model.Regions = await _context.Regions
                     .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Nom })
                     .ToListAsync();
 
-                model.Localites = model.RegionId > 0
-                    ? await _context.Localites
-                        .Where(l => l.RegionId == model.RegionId)
-                        .Select(l => new SelectListItem { Value = l.Id.ToString(), Text = l.Nom })
-                        .ToListAsync()
-                    : new List<SelectListItem>();
+                model.Localites = await _context.Localites
+                    .Where(l => l.RegionId == model.RegionId)
+                    .Select(l => new SelectListItem { Value = l.Id.ToString(), Text = l.Nom })
+                    .ToListAsync();
 
                 return View(model);
             }
@@ -165,12 +128,9 @@ namespace WebAppPMRC.Controllers
                     PrixM2 = model.PrixM2,
                     MontantComp = model.MontantComp,
                     Commentaire = model.Commentaire,
-                    LocaliteId = model.LocaliteId
+                    LocaliteId = model.LocaliteId,
+                    PhotoPath = model.Photo != null ? await _fileService.UploadFileAsync(model.Photo) : null
                 };
-
-                if (model.Photo != null)
-                    person.PhotoPath = await _fileService.UploadFileAsync(model.Photo);
-
                 _context.Persons.Add(person);
             }
             else
@@ -194,8 +154,42 @@ namespace WebAppPMRC.Controllers
                     _fileService.DeleteFile(person.PhotoPath);
                     person.PhotoPath = await _fileService.UploadFileAsync(model.Photo);
                 }
+            }
 
-                _context.Persons.Update(person);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Import(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Veuillez sélectionner un fichier.");
+
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                while (!reader.EndOfStream)
+                {
+                    var line = await reader.ReadLineAsync();
+                    var values = line.Split(',');
+
+                    var person = new Person
+                    {
+                        Nom = values[0],
+                        Prenom = values[1],
+                        Surnom = values[2],
+                        Contact = values[3],
+                        Longueur = Convert.ToDouble(values[4], CultureInfo.InvariantCulture),
+                        Largeur = Convert.ToDouble(values[5], CultureInfo.InvariantCulture),
+                        PrixM2 = Convert.ToDecimal(values[6], CultureInfo.InvariantCulture),
+                        MontantComp = Convert.ToDecimal(values[7], CultureInfo.InvariantCulture),
+                        Commentaire = values[8],
+                        LocaliteId = int.Parse(values[9])
+                    };
+
+                    _context.Persons.Add(person);
+                }
             }
 
             await _context.SaveChangesAsync();

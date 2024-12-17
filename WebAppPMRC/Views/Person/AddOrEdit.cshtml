@@ -61,8 +61,6 @@
                                 }
                             </select>
                         </div>
-
-
                     </div>
                 </div>
 
@@ -81,7 +79,7 @@
                         </div>
                         <div class="form-group">
                             <label>Superficie</label>
-                            <input type="text" id="superficieField" class="form-control" value="@Model.Superficie" readonly disabled/>
+                            <input type="text" id="superficieField" class="form-control" value="@Model.Superficie" readonly disabled />
                         </div>
                     </div>
                 </div>
@@ -120,8 +118,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-3">
-                <button type="button" class="btn btn-secondary" id="prevButton" disabled>Prev</button>
-                <button type="button" class="btn btn-primary" id="nextButton">Next</button>
+                <button type="button" class="btn btn-secondary" id="prevButton" disabled aria-label="Section précédente">Prev</button>
+                <button type="button" class="btn btn-primary" id="nextButton" aria-label="Section suivante">Next</button>
                 <button type="submit" class="btn btn-success d-none" id="submitButton">Save</button>
                 <a href="@Url.Action("Index", "Person")" class="btn btn-secondary">Back</a>
             </div>
