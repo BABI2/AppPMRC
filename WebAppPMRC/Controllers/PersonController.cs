@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using System.Globalization;
 using WebAppPMRC.Data;
 using WebAppPMRC.Models;
 using WebAppPMRC.Services;
 using WebAppPMRC.ViewModels;
-using System.Globalization;
 
 namespace WebAppPMRC.Controllers
 {
@@ -21,7 +22,7 @@ namespace WebAppPMRC.Controllers
         }
 
 
-        
+
         public async Task<IActionResult> Index()
         {
             var persons = await _context.Persons
@@ -164,11 +165,69 @@ namespace WebAppPMRC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            // Supprimer la photo associée si elle existe
+            if (!string.IsNullOrEmpty(person.PhotoPath))
+            {
+                _fileService.DeleteFile(person.PhotoPath);
+            }
+
+            _context.Persons.Remove(person);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Personne supprimée avec succès.";
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Import(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest("Veuillez sélectionner un fichier.");
+            {
+                TempData["Error"] = "Veuillez sélectionner un fichier.";
+                return RedirectToAction(nameof(Index));
+            }
 
+            try
+            {
+                var extension = Path.GetExtension(file.FileName).ToLower();
+
+                if (extension == ".csv")
+                {
+                    await ImportCsv(file);
+                }
+                else if (extension == ".xlsx")
+                {
+                    await ImportExcel(file);
+                }
+                else
+                {
+                    TempData["Error"] = "Format de fichier non supporté. Utilisez un fichier CSV ou Excel.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                TempData["Success"] = "Fichier importé avec succès.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Erreur lors de l'importation : {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Méthode pour importer un fichier CSV
+        private async Task ImportCsv(IFormFile file)
+        {
             using (var reader = new StreamReader(file.OpenReadStream()))
             {
                 while (!reader.EndOfStream)
@@ -193,9 +252,44 @@ namespace WebAppPMRC.Controllers
                     _context.Persons.Add(person);
                 }
             }
-
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+        }
+
+        // Méthode pour importer un fichier Excel
+        private async Task ImportExcel(IFormFile file)
+        {
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            // Obligatoire pour EPPlus
+
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using (var package = new ExcelPackage(stream))
+                {
+                    var worksheet = package.Workbook.Worksheets[0];
+                    var rowCount = worksheet.Dimension.Rows;
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        var person = new Person
+                        {
+                            Nom = worksheet.Cells[row, 1].Text,
+                            Prenom = worksheet.Cells[row, 2].Text,
+                            Surnom = worksheet.Cells[row, 3].Text,
+                            Contact = worksheet.Cells[row, 4].Text,
+                            Longueur = Convert.ToDouble(worksheet.Cells[row, 5].Text, CultureInfo.InvariantCulture),
+                            Largeur = Convert.ToDouble(worksheet.Cells[row, 6].Text, CultureInfo.InvariantCulture),
+                            PrixM2 = Convert.ToDecimal(worksheet.Cells[row, 7].Text, CultureInfo.InvariantCulture),
+                            MontantComp = Convert.ToDecimal(worksheet.Cells[row, 8].Text, CultureInfo.InvariantCulture),
+                            Commentaire = worksheet.Cells[row, 9].Text,
+                            LocaliteId = int.Parse(worksheet.Cells[row, 10].Text)
+                        };
+
+                        _context.Persons.Add(person);
+                    }
+                }
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

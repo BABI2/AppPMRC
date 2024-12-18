@@ -51,15 +51,17 @@
                     <li class="nav-item mt-4">
                         <a class="butonClick fs-4" asp-area="" asp-controller="NumeroDossier" asp-action="Index">Dossier</a>
                     </li>
-                    <!-- Lien vers l'importation' -->
-                    @*  <form asp-action="Import" method="post" enctype="multipart/form-data">
-                        <div>
-                            <label for="file">Importer un fichier CSV :</label>
-                            <input type="file" name="file" accept=".csv" />
-                            <button type="submit">Importer</button>
-                        </div>
-                    </form> *@
 
+                    <!-- Importation d'un fichier CSV -->
+                    <li class="nav-item mt-4">
+                        <form asp-action="Import" asp-controller="Person" method="post" enctype="multipart/form-data" class="p-2">
+                            @* <label for="file" class="text-white mb-2">Importer un fichier CSV :</label> *@
+                            <input type="file" name="file" id="file" accept=".csv" class="form-control mb-2" required />
+                            <button type="submit" class="btn btn-light btn-sm w-100">
+                                <i class="fas fa-upload"></i> Importer
+                            </button>
+                        </form>
+                    </li>
 
                     <!-- Lien vers la page des Personnes -->
                     <li class="nav-item mt-4">

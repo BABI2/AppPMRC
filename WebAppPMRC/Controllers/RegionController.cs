@@ -20,6 +20,7 @@ namespace WebAppPMRC.Controllers
             var regions = await _context.Regions
                                         .Include(r => r.Localites)
                                         .ToListAsync();
+
             var regionViewModels = regions.Select(r => new RegionViewModel
             {
                 Id = r.Id,
@@ -36,62 +37,74 @@ namespace WebAppPMRC.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddOrEdit(int? id)
+        public async Task<IActionResult> AddOrEdit(int? id)
         {
-            var region = id == null
-                ? new RegionViewModel()
-                : _context.Regions
-                          .Include(r => r.Localites)
-                          .Where(r => r.Id == id)
-                          .Select(r => new RegionViewModel
-                          {
-                              Id = r.Id,
-                              Nom = r.Nom,
-                              Localites = r.Localites.Select(l => new LocaliteViewModel
-                              {
-                                  Id = l.Id,
-                                  Nom = l.Nom,
-                                  RegionId = l.RegionId
-                              }).ToList()
-                          }).FirstOrDefault();
+            if (id == null) return View(new RegionViewModel());
 
-            return region == null ? NotFound() : View(region);
+            var region = await _context.Regions.FindAsync(id);
+            if (region == null) return NotFound();
+
+            return View(new RegionViewModel
+            {
+                Id = region.Id,
+                Nom = region.Nom
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit(RegionViewModel regionViewModel)
         {
-            if (!ModelState.IsValid) return View(regionViewModel);
-
-            var region = new Region
+            if (!ModelState.IsValid)
             {
-                Id = regionViewModel.Id,
-                Nom = regionViewModel.Nom,
-                Localites = regionViewModel.Localites.Select(l => new Localite
+                return View(regionViewModel);
+            }
+
+            try
+            {
+                var region = new Region
                 {
-                    Id = l.Id,
-                    Nom = l.Nom,
-                    RegionId = regionViewModel.Id
-                }).ToList()
-            };
+                    Id = regionViewModel.Id,
+                    Nom = regionViewModel.Nom
+                };
 
-            if (region.Id == 0) _context.Regions.Add(region);
-            else _context.Regions.Update(region);
+                if (region.Id == 0)
+                {
+                    _context.Regions.Add(region);
+                }
+                else
+                {
+                    _context.Entry(region).State = EntityState.Modified;
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur : {ex.Message}");
+                return View(regionViewModel);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var region = await _context.Regions.FindAsync(id);
-            if (region == null) return NotFound();
+            try
+            {
+                var region = await _context.Regions.FindAsync(id);
+                if (region == null) return NotFound();
 
-            _context.Regions.Remove(region);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                _context.Regions.Remove(region);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur : {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }
+

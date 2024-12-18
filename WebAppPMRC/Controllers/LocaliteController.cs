@@ -22,6 +22,7 @@ namespace WebAppPMRC.Controllers
                                           .Include(l => l.Region)
                                           .OrderBy(l => l.Nom)
                                           .ToListAsync();
+
             var localiteViewModels = localites.Select(l => new LocaliteViewModel
             {
                 Id = l.Id,
@@ -61,37 +62,53 @@ namespace WebAppPMRC.Controllers
                 return View(localiteViewModel);
             }
 
-            if (localiteViewModel.Id == 0)
+            try
             {
-                _context.Localites.Add(new Localite
+                if (localiteViewModel.Id == 0)
                 {
-                    Nom = localiteViewModel.Nom,
-                    RegionId = localiteViewModel.RegionId
-                });
+                    _context.Localites.Add(new Localite
+                    {
+                        Nom = localiteViewModel.Nom,
+                        RegionId = localiteViewModel.RegionId
+                    });
+                }
+                else
+                {
+                    var localite = await _context.Localites.FindAsync(localiteViewModel.Id);
+                    if (localite == null) return NotFound();
+
+                    localite.Nom = localiteViewModel.Nom;
+                    localite.RegionId = localiteViewModel.RegionId;
+                    _context.Localites.Update(localite);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            else
+            catch (Exception ex)
             {
-                var localite = await _context.Localites.FindAsync(localiteViewModel.Id);
-                if (localite == null) return NotFound();
-
-                localite.Nom = localiteViewModel.Nom;
-                localite.RegionId = localiteViewModel.RegionId;
-                _context.Localites.Update(localite);
+                Console.WriteLine($"Erreur : {ex.Message}");
+                return View(localiteViewModel);
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var localite = await _context.Localites.FindAsync(id);
-            if (localite == null) return NotFound();
+            try
+            {
+                var localite = await _context.Localites.FindAsync(id);
+                if (localite == null) return NotFound();
 
-            _context.Localites.Remove(localite);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                _context.Localites.Remove(localite);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur : {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpGet]
@@ -105,3 +122,4 @@ namespace WebAppPMRC.Controllers
         }
     }
 }
+

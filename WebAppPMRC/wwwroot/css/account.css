@@ -53,3 +53,7 @@ body {
         background-color: #1e3c72;
         color: white;
     }
+.disabled-link {
+    pointer-events: none;
+    color: #6c757d; /* Gris clair pour un effet désactivé */
+}

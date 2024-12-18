@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebAppPMRC.Models;
 using WebAppPMRC.ViewModels;
@@ -18,7 +17,7 @@ namespace WebAppPMRC.Controllers
         }
 
         // GET: Login
-        
+
         public IActionResult Login()
         {
             return View();
